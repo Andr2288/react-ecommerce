@@ -1,5 +1,3 @@
-// D:/RECOVER_DATA/Programming/React_Node.js/CHAT-APP/frontend/src/store\useAuthStore.js
-
 import {create} from "zustand"
 
 import {axiosInstance} from "../lib/axios.js";
