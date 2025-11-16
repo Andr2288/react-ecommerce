@@ -4,6 +4,7 @@ import Navbar from "./components/Navbar.jsx";
 
 import SignUpPage from "./pages/SignUpPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
+import HomePage from "./pages/HomePage.jsx";
 
 import {useAuthStore} from "./store/useAuthStore.js";
 import {useEffect} from "react";
@@ -30,11 +31,36 @@ const App = () => {
 
     return (
         <div>
-
             <Navbar />
 
             <Routes>
+                {/* Public routes - redirect to home if already authenticated */}
+                <Route
+                    path="/login"
+                    element={!authUser ? <LoginPage /> : <Navigate to="/home" />}
+                />
+                <Route
+                    path="/register"
+                    element={!authUser ? <SignUpPage /> : <Navigate to="/home" />}
+                />
 
+                {/* Protected routes - redirect to login if not authenticated */}
+                <Route
+                    path="/home"
+                    element={authUser ? <HomePage /> : <Navigate to="/login" />}
+                />
+
+                {/* Default redirects */}
+                <Route
+                    path="/"
+                    element={<Navigate to={authUser ? "/home" : "/login"} />}
+                />
+
+                {/* Catch all unknown routes */}
+                <Route
+                    path="*"
+                    element={<Navigate to={authUser ? "/home" : "/login"} />}
+                />
             </Routes>
         </div>
     )
