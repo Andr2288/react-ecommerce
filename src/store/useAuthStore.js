@@ -12,20 +12,16 @@ export const useAuthStore = create((set, get) => ({
     checkAuth: async () => {
         try {
             const token = localStorage.getItem("token");
-            console.log("Checking auth, token:", token ? "exists" : "not found");
-
             if (!token) {
                 set({authUser: null, isCheckingAuth: false});
                 return;
             }
 
             const res = await axiosInstance.get("/auth/check");
-            console.log("Auth check response:", res.data);
             set({authUser: res.data, isCheckingAuth: false});
         }
         catch (error) {
             console.log("Error in checkAuth", error);
-            console.log("Error response:", error.response?.data);
             localStorage.removeItem("token");
             set({authUser: null, isCheckingAuth: false});
         }
@@ -34,9 +30,7 @@ export const useAuthStore = create((set, get) => ({
     signup: async (userData) => {
         set({isSigningUp: true});
         try {
-            console.log("Sending signup request:", userData);
             const res = await axiosInstance.post("/auth/register", userData);
-            console.log("Signup response:", res.data);
 
             // Store JWT token
             localStorage.setItem("token", res.data.token);
@@ -55,11 +49,7 @@ export const useAuthStore = create((set, get) => ({
             toast.success("Account created successfully!");
         } catch (error) {
             set({isSigningUp: false});
-            console.error("Signup error:", error);
-            console.error("Error response:", error.response?.data);
-            console.error("Error status:", error.response?.status);
-
-            const errorMessage = error.response?.data?.message || error.response?.data || "Registration failed";
+            const errorMessage = error.response?.data?.message || "Registration failed";
             toast.error(errorMessage);
             throw new Error(errorMessage);
         }
@@ -68,11 +58,7 @@ export const useAuthStore = create((set, get) => ({
     login: async (credentials) => {
         set({isLoggingIn: true});
         try {
-            console.log("Sending login request:", credentials);
-            console.log("Request URL:", axiosInstance.defaults.baseURL + "/auth/login");
-
             const res = await axiosInstance.post("/auth/login", credentials);
-            console.log("Login response:", res.data);
 
             // Store JWT token
             localStorage.setItem("token", res.data.token);
@@ -91,23 +77,7 @@ export const useAuthStore = create((set, get) => ({
             toast.success(`Welcome back, ${res.data.name}!`);
         } catch (error) {
             set({isLoggingIn: false});
-            console.error("Login error full:", error);
-            console.error("Error response:", error.response?.data);
-            console.error("Error status:", error.response?.status);
-            console.error("Error headers:", error.response?.headers);
-
-            let errorMessage = "Login failed";
-
-            if (error.response?.data) {
-                if (typeof error.response.data === 'string') {
-                    errorMessage = error.response.data;
-                } else if (error.response.data.message) {
-                    errorMessage = error.response.data.message;
-                } else if (error.response.data.error) {
-                    errorMessage = error.response.data.error;
-                }
-            }
-
+            const errorMessage = error.response?.data?.message || "Login failed";
             toast.error(errorMessage);
             throw new Error(errorMessage);
         }
